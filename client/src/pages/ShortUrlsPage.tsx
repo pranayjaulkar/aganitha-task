@@ -8,6 +8,7 @@ import { DeleteModal } from "../components/DeleteModal";
 import { useDebounce } from "../hooks/useDebounce";
 import { API_BASE_URL } from "../utils/contants";
 import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 export function ShortUrlsPage() {
   const [urls, setUrls] = useState<ShortUrl[]>([]);
@@ -16,13 +17,16 @@ export function ShortUrlsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUrl, setEditingUrl] = useState<ShortUrl | null>(null);
   const [deletingUrl, setDeletingUrl] = useState<ShortUrl | null>(null);
+  const navigate = useNavigate();
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const fetchUrls = async (query?: string) => {
     try {
       setIsLoading(true);
-      const url = query ? `${API_BASE_URL}/api/shorturls?q=${encodeURIComponent(query)}` : `${API_BASE_URL}/api/shorturls`;
+      const url = query
+        ? `${API_BASE_URL}/api/shorturls?q=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/api/shorturls`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -136,7 +140,7 @@ export function ShortUrlsPage() {
   };
 
   const handleRowClick = (code: string) => {
-    window.location.href = `/codes/${code}`;
+    navigate(`/code/${code}`);
   };
 
   return (

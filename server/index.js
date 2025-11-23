@@ -25,6 +25,18 @@ mongoose
     console.log("MongoDB Connection Error\n", error);
   });
 
+function generateCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const length = crypto.randomInt(6, 9);
+  let code = "";
+
+  for (let i = 0; i < length; i++) {
+    code += chars[crypto.randomInt(chars.length)];
+  }
+
+  return code;
+}
+
 app.get("/api/shorturls", async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -68,7 +80,7 @@ app.post("/api/shorturls", async (req, res) => {
     let { url } = req.body;
     if (!url) return res.status(400).json({ error: "URL is required" });
 
-    const code = crypto.randomBytes(4).toString("hex");
+    const code = generateCode();
 
     const codeExists = await ShortUrl.findOne({ code });
     const urlExists = await ShortUrl.findOne({ url });
@@ -96,7 +108,7 @@ app.put("/api/shorturls/:code", async (req, res) => {
     let maxTries = 0;
     let newCode;
     while (newCodeAlreadyExists) {
-      newCode = crypto.randomBytes(5).toString("hex");
+      newCode = generateCode();
       newCodeAlreadyExists = (await ShortUrl.findOne({ code: newCode })) || newCode === code;
 
       if (maxTries >= 5) {
@@ -134,6 +146,10 @@ app.delete("/api/shorturls/:code", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Failed to delete short URL" });
   }
+});
+
+app.get("/healthz", async (req, res) => {
+  res.json({ ok: true });
 });
 
 app.get("/:code", async (req, res) => {

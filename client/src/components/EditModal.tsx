@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Modal } from './Modal';
+import { useState, useEffect } from "react";
+import { Modal } from "./Modal";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -11,18 +11,20 @@ interface EditModalProps {
 export function EditModal({ isOpen, onClose, onSubmit, currentUrl }: EditModalProps) {
   const [targetUrl, setTargetUrl] = useState(currentUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [urlChange, setUrlChange] = useState({ old: "", new: "" });
 
   useEffect(() => {
     setTargetUrl(currentUrl);
+    setUrlChange({ new: currentUrl, old: currentUrl });
   }, [currentUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!targetUrl.trim()) {
-      setError('Target URL is required');
+      setError("Target URL is required");
       return;
     }
 
@@ -31,7 +33,7 @@ export function EditModal({ isOpen, onClose, onSubmit, currentUrl }: EditModalPr
       await onSubmit(targetUrl);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update short URL');
+      setError(err instanceof Error ? err.message : "Failed to update short URL");
     } finally {
       setIsSubmitting(false);
     }
@@ -48,7 +50,10 @@ export function EditModal({ isOpen, onClose, onSubmit, currentUrl }: EditModalPr
             id="editTargetUrl"
             type="url"
             value={targetUrl}
-            onChange={(e) => setTargetUrl(e.target.value)}
+            onChange={(e) => {
+              setTargetUrl(e.target.value);
+              setUrlChange((prev) => ({ ...prev, new: e.target.value }));
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="https://example.com"
             disabled={isSubmitting}
@@ -67,9 +72,9 @@ export function EditModal({ isOpen, onClose, onSubmit, currentUrl }: EditModalPr
           <button
             type="submit"
             className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            disabled={isSubmitting}
+            disabled={urlChange.new === urlChange.old || isSubmitting}
           >
-            {isSubmitting ? 'Updating...' : 'Update'}
+            {isSubmitting ? "Updating..." : "Update"}
           </button>
         </div>
       </form>

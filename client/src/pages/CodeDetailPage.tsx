@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Copy, Check } from "lucide-react";
 import type { ShortUrl } from "../types";
 import { API_BASE_URL } from "../utils/contants";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
 
 export function CodeDetailPage() {
@@ -11,18 +11,17 @@ export function CodeDetailPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
   const navigate = useNavigate();
+  const params = useParams();
 
   const shortenedUrl = `${import.meta.env.PROD ? "https" : "http"}://${
     import.meta.env.PROD ? window.location.hostname : "localhost:5000"
   }/${url?.code || ""}`;
 
-  const code = window.location.pathname.split("/codes/")[1];
-
   useEffect(() => {
     const fetchUrlDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_BASE_URL}/api/shorturls/${code}`);
+        const response = await fetch(`${API_BASE_URL}/api/shorturls/${params.code}`);
         if (!response.ok) throw new Error("Failed to fetch URL details");
         const data = await response.json();
         setUrl(data);
@@ -33,10 +32,10 @@ export function CodeDetailPage() {
       }
     };
 
-    if (code) {
+    if (params.code) {
       fetchUrlDetails();
     }
-  }, [code]);
+  }, [params.code]);
 
   const formatDate = (date: string | null) => {
     if (!date) return "Never";

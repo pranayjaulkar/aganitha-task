@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Toaster />
       <Routes>
-        <Route path="/codes/:code" element={<CodeDetailPage />} />
+        <Route path="/code/:code" element={<CodeDetailPage />} />
         <Route path="/codes" element={<ShortUrlsPage />} />
         <Route path="/*" element={<Navigate to={"/codes"} />} />
       </Routes>
